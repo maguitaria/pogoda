@@ -73,4 +73,10 @@ dependencies {
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+    // Jetpack Compose
+
+
+// Material 3
+    implementation ("com.google.android.material:material3:3.4.0")
+
 }

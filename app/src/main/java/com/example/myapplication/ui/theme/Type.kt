@@ -1,34 +1,47 @@
 package com.example.myapplication.ui.theme
-
 import androidx.compose.material3.Typography
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 
-// Set of Material typography styles to start with
+val fonts = FontFamily(
+    Font(R.font.robotothin, FontWeight.Light),
+    Font(R.font.robotothin, FontWeight.SemiBold),
+    Font(R.font.robotothin, FontWeight.Normal)
+)
+
 val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+    displayLarge = TextStyle(
+        fontFamily = fonts,
+        fontWeight = FontWeight.Light,
+        color = Color.White,
+        fontSize = 96.sp,
+        letterSpacing = 0.sp,
+    ),
+    displayMedium = TextStyle(
+        fontFamily = fonts,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
+        color = Color.White,
+        fontSize = 36.sp,
         letterSpacing = 0.sp
     ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+    displaySmall = TextStyle(
+        fontFamily = fonts,
+        fontWeight = FontWeight.SemiBold,
+        color = Color.White,
+        fontSize = 20.sp,
+        letterSpacing = 0.sp
+    ),
+
+    bodySmall = TextStyle(
+        fontFamily = fonts,
+        fontWeight = FontWeight.SemiBold,
+        color = Color.White,
+        fontSize = 18.sp,
+        letterSpacing = 0.sp,
+    ),
 )

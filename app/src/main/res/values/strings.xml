@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="city_name" />
+    <string name="send_request">Send Request\n</string>
 </resources>
