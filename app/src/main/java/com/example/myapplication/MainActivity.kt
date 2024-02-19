@@ -6,9 +6,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -17,7 +19,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -58,12 +62,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-}
+    }
 
     @Preview
-@Composable
+    @Composable
     fun WeatherApp() {
-
         mainViewModel = MainViewModel()
         subscribe()
 
@@ -75,49 +78,62 @@ class MainActivity : AppCompatActivity() {
                 .padding(16.dp)
         ) {
             Header()
-            TextField(
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Search Field for City Name
+            OutlinedTextField(
                 value = cityName,
                 onValueChange = { cityName = it },
                 label = { Text(text = "Enter your city") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
-                    .padding(bottom = 20.dp),
-                textStyle = LocalTextStyle.current.copy(fontSize = 24.sp),
+                    .height(60.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 ),
-                singleLine = true
+                singleLine = true,
+                textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Weather result
             Text(
                 text = "Weather Result",
                 fontSize = 18.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 20.dp)
+                modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    mainViewModel.getWeatherData(cityName)
+                    if (cityName.isNotBlank()) {
+                        mainViewModel.getWeatherData(cityName)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
+                    .height(60.dp),
+                enabled = cityName.isNotBlank()
             ) {
                 Icon(Icons.Default.Send, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "Send Request")
             }
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Display Weather Information
+            val weatherData by mainViewModel.weatherData.observeAsState(null)
+            weatherData?.let { setResultText(it) }
         }
     }
 
     @Composable
     fun Header() {
         Text(
-            text = "Weather",
+            text = "",
             style = MaterialTheme.typography.displaySmall,
             modifier = Modifier
                 .padding(all = 20.dp)
@@ -129,42 +145,102 @@ class MainActivity : AppCompatActivity() {
         val isLoading by mainViewModel.isLoading.observeAsState(false)
         val isError by mainViewModel.isError.observeAsState(false)
         val weatherData by mainViewModel.weatherData.observeAsState(null)
-
+        var isPopupVisible by remember { mutableStateOf(false) }
         if (isLoading) {
-            // Handle loading state
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(50.dp)
+                    .padding(16.dp)
+            )
         }
 
         if (isError) {
-            // Handle error state
+            isPopupVisible = true
+            AlertDialog(
+                onDismissRequest = {
+                    isPopupVisible = false
+                },
+                title = {
+                    Text(text = "Error")
+                },
+                text = {
+                    Text(text = mainViewModel.errorMessage ?: "An error occurred")
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            isPopupVisible = false
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                }
+            )
         }
-
-        if (weatherData != null) {
-            // Display weather data to the UI
-            setResultText(weatherData)
+        // Display specific error message for the case where no matching location is found
+        mainViewModel.errorMessage?.let { errorMessage ->
+            if (errorMessage.contains("No matching location found", ignoreCase = true)) {
+                // Show a specific message or UI for this error
+                Text("No matching location found")
+            }
         }
+        weatherData?.let { setResultText(it) }
     }
-@Composable
-private fun setResultText(weatherData: CurrentWeatherResponse) {
-    val resultText = buildAnnotatedString {
-        withStyle(style = SpanStyle(fontSize = 18.sp)) {
-            append("Name: ${weatherData.location?.name}\n")
-            append("Region: ${weatherData.location?.region}\n")
-            append("Country: ${weatherData.location?.country}\n")
-            append("Timezone ID: ${weatherData.location?.tzId}\n")
-            append("Local Time: ${weatherData.location?.localtime}\n")
-            append("\n")
 
-            append("Condition: ${weatherData.current?.condition?.text}\n")
-            append("Celcius: ${weatherData.current?.tempC}\n")
-            append("Fahrenheit: ${weatherData.current?.tempF}\n")
+    @Composable
+    private fun setResultText(weatherData: CurrentWeatherResponse) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                // Load image from URL using NetworkImage
+                weatherData.current?.condition?.icon?.let { iconUrl ->
+                    Image(
+                        painter = rememberCoilPainter(request = iconUrl),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(64.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Display text in a fancy way
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontSize = 18.sp)) {
+                            append("Name: ${weatherData.location?.name}\n")
+
+                            append("Country: ${weatherData.location?.country}\n")
+                            append("Timezone ID: ${weatherData.location?.tzId}\n")
+                            append("Local Time: ${weatherData.location?.localtime}\n")
+                            append("\n")
+
+                            append("Condition: ${weatherData.current?.condition?.text}\n")
+                            append("Current temperature (C): ${weatherData.current?.tempC}\n")
+                            append("Wind speed (kph): ${weatherData.current?.wind_kph}\n")
+                            append("Fahrenheit: ${weatherData.current?.tempF}\n")
+                        }
+                    },
+                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.displayMedium,
+                )
+            }
         }
-    }
-
-    Text(
-        text = resultText,
-        modifier = Modifier.padding(bottom = 20.dp),
-        fontSize = 18.sp
-    )
     }
 }
+
 

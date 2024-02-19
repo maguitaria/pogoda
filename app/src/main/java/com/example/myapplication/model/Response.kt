@@ -50,5 +50,8 @@ data class Current(
 	val tempF: Double? = null,
 
 	@field:SerializedName("condition")
-	val condition: Condition? = null
+	val condition: Condition? = null,
+
+	@field:SerializedName("wind_kph")
+	val wind_kph: String? = null
 )
