@@ -3,4 +3,5 @@
     <string name="city_name" />
     <string name="send_request">Send Request\n</string>
     <string name="loading" />
+    <string name="my_app" />
 </resources>
