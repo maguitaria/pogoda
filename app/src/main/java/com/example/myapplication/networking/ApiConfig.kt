@@ -11,6 +11,7 @@ class ApiConfig {
 
     companion object {
 
+      //  val API_KEY : String? = System.getenv("API_KEY")
         fun getApiService() : APIInterface {
             // Api responce interceptor
             val loggingInterceptor = HttpLoggingInterceptor()
@@ -28,7 +29,7 @@ class ApiConfig {
             return retrofit.create(APIInterface::class.java)
 
         }
-        const  val API_KEY = "af0393288db44404bfe95148240702"
+       const  val API_KEY = "af0393288db44404bfe95148240702"
     }
 
 }

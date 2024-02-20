@@ -1,45 +1,59 @@
 package com.example.myapplication
 
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.bumptech.glide.Glide
 import com.composeweatherapp.core.designsystem.theme.ComposeWeatherAppTheme
 import com.example.myapplication.model.CurrentWeatherResponse
 import com.example.myapplication.viewmodel.MainViewModel
@@ -49,10 +63,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainViewModel: MainViewModel
 
-    private lateinit var etCityName: EditText
-    private lateinit var imgCondition: ImageView
-    private lateinit var tvResult: TextView
-    private lateinit var btnSend: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -80,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         subscribe()
 
         var cityName by remember { mutableStateOf("") }
-
+        var cityNameInput by remember { mutableStateOf("") }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -106,10 +116,13 @@ class MainActivity : AppCompatActivity() {
 //TODO add handling of special characters sending to API request
 
             Spacer(modifier = Modifier.height(16.dp))
+
             Button(
                 onClick = {
                     if (cityName.isNotBlank()) {
                         mainViewModel.getWeatherData(cityName)
+                        cityNameInput = cityName
+
                     }
                 },
                 modifier = Modifier
@@ -131,20 +144,22 @@ class MainActivity : AppCompatActivity() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
             val weatherData by mainViewModel.weatherData.observeAsState(null)
             weatherData?.let {
+                CoilImage(it)
                 setResultText(it)
+
             }
 
         }
     }
+
     // New function for CoilImage
     @Composable
     private fun CoilImage(weatherData: CurrentWeatherResponse) {
         // Get the icon URL from weather data
         val iconUrl = "https:${weatherData.current?.condition?.icon}"
-println(iconUrl)
+        println(iconUrl)
         // Create a white rounded background for the icon
         Box(
             modifier = Modifier
@@ -155,8 +170,12 @@ println(iconUrl)
             Image(
                 painter = rememberAsyncImagePainter(model = iconUrl),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
+               contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(100.dp)
+                    .padding(bottom = 16.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.Center)
             )
         }
     }
@@ -202,20 +221,21 @@ println(iconUrl)
                     TextButton(
                         onClick = {
                             isPopupVisible = false
+                            Log.e("Error", mainViewModel.errorMessage ?: "An error occurred")
                         }
                     ) {
                         Text("OK")
-                        //TODO add error handling here
                     }
                 }
             )
         }
-        // Display specific error message for the case where no matching location is found
+
         mainViewModel.errorMessage?.let { errorMessage ->
             if (errorMessage.contains("No matching location found", ignoreCase = true)) {
                 // Show a specific message or UI for this error
                 Text("No matching location found")
             }
+
         }
 
     }
@@ -223,44 +243,63 @@ println(iconUrl)
 
     @Composable
     private fun setResultText(weatherData: CurrentWeatherResponse) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(500.dp)
-                .padding(16.dp)
+                .background(Color.Gray) // Use the desired background color
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(16.dp)
             ) {
+                // Display town name in a larger font
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            style = SpanStyle(
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        ) {
+                            append("${weatherData.location?.name}")
+                        }
+                    },
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
 
-            CoilImage(weatherData)
-                Spacer(modifier = Modifier.height(16.dp))
+                // Display temperature
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontSize = 24.sp)) {
+                            append("${weatherData.current?.tempC}°C")
+                        }
+                    },
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
+                // Additional weather information
                 Text(
                     text = buildAnnotatedString {
                         withStyle(style = SpanStyle(fontSize = 18.sp)) {
-                            append(" ${weatherData.location?.name}\n")
-
+                            append("Condition: ${weatherData.current?.condition?.text}\n")
                             append("Country: ${weatherData.location?.country}\n")
                             append("Timezone ID: ${weatherData.location?.tzId}\n")
                             append("Local Time: ${weatherData.location?.localtime}\n")
-                            append("Condition: ${weatherData.current?.condition?.text}\n")
-                            append("Current temperature (C): ${weatherData.current?.tempC}\n")
                             append("Wind speed (kph): ${weatherData.current?.wind_kph}\n")
                             append("Fahrenheit: ${weatherData.current?.tempF}\n")
                         }
                     },
-                    fontSize = 18.sp,
-                    style = MaterialTheme.typography.displayMedium,
+                    color = Color.White
                 )
             }
         }
     }
 }
+
 
 
