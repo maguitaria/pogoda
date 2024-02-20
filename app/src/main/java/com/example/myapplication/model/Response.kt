@@ -8,7 +8,11 @@ data class CurrentWeatherResponse(
 	val current: Current? = null,
 
 	@field:SerializedName("location")
-	val location: Location? = null
+	val location: Location? = null,
+
+	@field:SerializedName("condition")
+	val condition: Condition? = null
+
 )
 
 data class Condition(
@@ -17,7 +21,10 @@ data class Condition(
 	val icon: String? = null,
 
 	@field:SerializedName("text")
-	val text: String? = null
+	val text: String? = null,
+
+	@field:SerializedName("code")
+	val code: String? = null
 )
 
 data class Location(

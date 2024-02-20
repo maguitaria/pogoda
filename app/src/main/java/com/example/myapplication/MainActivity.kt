@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
@@ -22,7 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
@@ -31,6 +35,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import com.bumptech.glide.Glide
 import com.composeweatherapp.core.designsystem.theme.ComposeWeatherAppTheme
 import com.example.myapplication.model.CurrentWeatherResponse
 import com.example.myapplication.viewmodel.MainViewModel
@@ -94,18 +103,9 @@ class MainActivity : AppCompatActivity() {
                 singleLine = true,
                 textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
             )
+//TODO add handling of special characters sending to API request
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Weather result
-            Text(
-                text = "Weather Result",
-                fontSize = 18.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             Button(
                 onClick = {
                     if (cityName.isNotBlank()) {
@@ -122,18 +122,50 @@ class MainActivity : AppCompatActivity() {
                 Text(text = "Send Request")
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            // Weather result
+            Text(
+                text = "Weather Result",
+                fontSize = 18.sp,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-            // Display Weather Information
+            Spacer(modifier = Modifier.height(16.dp))
+
+
             val weatherData by mainViewModel.weatherData.observeAsState(null)
-            weatherData?.let { setResultText(it) }
+            weatherData?.let {
+                setResultText(it)
+            }
+
         }
     }
+    // New function for CoilImage
+    @Composable
+    private fun CoilImage(weatherData: CurrentWeatherResponse) {
+        // Get the icon URL from weather data
+        val iconUrl = "https:${weatherData.current?.condition?.icon}"
+println(iconUrl)
+        // Create a white rounded background for the icon
+        Box(
+            modifier = Modifier
+                .size(120.dp) // Adjust the size as needed
+                .background(Color.Black, shape = RoundedCornerShape(8.dp))
+        ) {
+            // Load image from URL using Coil's rememberImagePainter
+            Image(
+                painter = rememberAsyncImagePainter(model = iconUrl),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
+        }
+    }
+
 
     @Composable
     fun Header() {
         Text(
-            text = "",
+            text = "Weather Forecast",
             style = MaterialTheme.typography.displaySmall,
             modifier = Modifier
                 .padding(all = 20.dp)
@@ -173,6 +205,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     ) {
                         Text("OK")
+                        //TODO add error handling here
                     }
                 }
             )
@@ -184,8 +217,9 @@ class MainActivity : AppCompatActivity() {
                 Text("No matching location found")
             }
         }
-        weatherData?.let { setResultText(it) }
+
     }
+
 
     @Composable
     private fun setResultText(weatherData: CurrentWeatherResponse) {
@@ -195,7 +229,7 @@ class MainActivity : AppCompatActivity() {
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(500.dp)
                 .padding(16.dp)
         ) {
             Column(
@@ -203,32 +237,18 @@ class MainActivity : AppCompatActivity() {
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                // Load image from URL using NetworkImage
-                weatherData.current?.condition?.icon?.let { iconUrl ->
-                    Image(
-                        painter = rememberCoilPainter(request = iconUrl),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(64.dp)
-                            .align(Alignment.CenterHorizontally)
-                    )
-                }
 
+            CoilImage(weatherData)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Display text in a fancy way
                 Text(
                     text = buildAnnotatedString {
                         withStyle(style = SpanStyle(fontSize = 18.sp)) {
-                            append("Name: ${weatherData.location?.name}\n")
+                            append(" ${weatherData.location?.name}\n")
 
                             append("Country: ${weatherData.location?.country}\n")
                             append("Timezone ID: ${weatherData.location?.tzId}\n")
                             append("Local Time: ${weatherData.location?.localtime}\n")
-                            append("\n")
-
                             append("Condition: ${weatherData.current?.condition?.text}\n")
                             append("Current temperature (C): ${weatherData.current?.tempC}\n")
                             append("Wind speed (kph): ${weatherData.current?.wind_kph}\n")
