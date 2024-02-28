@@ -1,31 +1,29 @@
-package com.composeweatherapp.core.designsystem.theme
+package com.example.myapplication.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import com.example.myapplication.ui.theme.Shapes
-import com.example.myapplication.ui.theme.Typography
 
 private val DarkColorPalette = darkColorScheme(
-    primary = Black,
+    primary = Pink,
+    secondary = SecondaryColor,
+    onSurface = SurfaceColor,
+    onSecondary = OnSecondaryColor,
 
-    secondary = TransparentDarkBlue,
-    onSurface = WhiteTransparent,
-    onSecondary = HighTransparentDarkBlue,
-
-    error = ErrorRed
+    error = SurfaceColor
 )
 
 private val LightColorPalette = lightColorScheme(
-    primary = Black,
+    primary = Pink,
 
-    secondary = TransparentDarkBlue,
-    onSurface = WhiteTransparent,
-    onSecondary = HighTransparentDarkBlue,
+    secondary = SecondaryColor,
+    onSurface = SurfaceColor,
+    onSecondary = OnSecondaryColor,
+    onBackground = BackgroundColor,
 
-    error = ErrorRed
+    error = SurfaceColor
 )
 
 @Composable
@@ -33,7 +31,7 @@ fun ComposeWeatherAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) {
+    val colorScheme = if (darkTheme) {
         DarkColorPalette
     } else {
         LightColorPalette
@@ -42,7 +40,7 @@ fun ComposeWeatherAppTheme(
 
 
     MaterialTheme(
-        colorScheme = colors,
+        colorScheme = colorScheme,
         typography = Typography,
         shapes = Shapes,
         content = content

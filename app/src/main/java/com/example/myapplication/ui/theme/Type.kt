@@ -18,7 +18,7 @@ val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = fonts,
         fontWeight = FontWeight.Light,
-        color = Color.White,
+        color = Color.Black,
         fontSize = 96.sp,
         letterSpacing = 0.sp,
     ),

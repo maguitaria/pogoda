@@ -1,15 +1,11 @@
 package com.example.myapplication
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,16 +20,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -45,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -54,15 +50,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.composeweatherapp.core.designsystem.theme.ComposeWeatherAppTheme
+import com.example.myapplication.ui.theme.ComposeWeatherAppTheme
 import com.example.myapplication.model.CurrentWeatherResponse
 import com.example.myapplication.viewmodel.MainViewModel
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 // https://medium.com/@dimaswisodewo98/fetch-data-from-api-in-android-studio-kotlin-using-retrofit-with-mvvm-architecture-4f6b673f6a28
+
+
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mainViewModel: MainViewModel
 
+    private lateinit var mainViewModel: MainViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,10 +74,9 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             ComposeWeatherAppTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.onSurface
                 ) {
                     WeatherApp()
                 }
@@ -135,18 +138,12 @@ class MainActivity : AppCompatActivity() {
                 Text(text = "Send Request")
             }
 
-            // Weather result
-            Text(
-                text = "Weather Result",
-                fontSize = 18.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
-
             Spacer(modifier = Modifier.height(16.dp))
 
             val weatherData by mainViewModel.weatherData.observeAsState(null)
             weatherData?.let {
                 CoilImage(it)
+                Spacer(modifier = Modifier.height(16.dp))
                 setResultText(it)
 
             }
@@ -164,7 +161,8 @@ class MainActivity : AppCompatActivity() {
         Box(
             modifier = Modifier
                 .size(120.dp) // Adjust the size as needed
-                .background(Color.Black, shape = RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
         ) {
             // Load image from URL using Coil's rememberImagePainter
             Image(
@@ -190,64 +188,63 @@ class MainActivity : AppCompatActivity() {
                 .padding(all = 20.dp)
         )
     }
-
     @Composable
     private fun subscribe() {
+        val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
         val isLoading by mainViewModel.isLoading.observeAsState(false)
         val isError by mainViewModel.isError.observeAsState(false)
-        val weatherData by mainViewModel.weatherData.observeAsState(null)
-        var isPopupVisible by remember { mutableStateOf(false) }
+
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier
-                    .size(50.dp)
+                    .size(70.dp)
                     .padding(16.dp)
             )
         }
 
         if (isError) {
-            isPopupVisible = true
-            AlertDialog(
-                onDismissRequest = {
-                    isPopupVisible = false
-                },
-                title = {
-                    Text(text = "Error")
-                },
-                text = {
-                    Text(text = mainViewModel.errorMessage ?: "An error occurred")
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            isPopupVisible = false
-                            Log.e("Error", mainViewModel.errorMessage ?: "An error occurred")
-                        }
-                    ) {
-                        Text("OK")
-                    }
+            LaunchedEffect(isError) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = "An error occurred",
+                        actionLabel = "Dismiss"
+                    )
                 }
-            )
-        }
-
-        mainViewModel.errorMessage?.let { errorMessage ->
-            if (errorMessage.contains("No matching location found", ignoreCase = true)) {
-                // Show a specific message or UI for this error
-                Text("No matching location found")
             }
-
         }
 
+        // Display the snackbar
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.padding(16.dp)
+                .background(Color.White)
+        ) {
+            Snackbar(
+modifier = Modifier
+    .background(MaterialTheme.colorScheme.primary)
+            ) {
+                Text(
+                    text =  "An error occured",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable {
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                        }
+                )
+            }
+        }
     }
-
 
     @Composable
     private fun setResultText(weatherData: CurrentWeatherResponse) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Gray) // Use the desired background color
-                .padding(16.dp),
+                .background(Color.White) // Use the desired background color
+                .padding(16.dp)
+                .border(1.dp, MaterialTheme.colorScheme.primary),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -267,8 +264,9 @@ class MainActivity : AppCompatActivity() {
                             append("${weatherData.location?.name}")
                         }
                     },
-                    color = Color.White,
+                    color = Color.Black,
                     modifier = Modifier.padding(bottom = 8.dp)
+
                 )
 
                 // Display temperature
@@ -278,7 +276,7 @@ class MainActivity : AppCompatActivity() {
                             append("${weatherData.current?.tempC}°C")
                         }
                     },
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
@@ -294,7 +292,7 @@ class MainActivity : AppCompatActivity() {
                             append("Fahrenheit: ${weatherData.current?.tempF}\n")
                         }
                     },
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
