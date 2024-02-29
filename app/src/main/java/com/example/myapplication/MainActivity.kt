@@ -1,75 +1,37 @@
 package com.example.myapplication
 
+import WeatherApp
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.ComposeWeatherAppTheme
-import com.example.myapplication.model.CurrentWeatherResponse
-import com.example.myapplication.viewmodel.MainViewModel
-import androidx.compose.foundation.clickable
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
-
 // https://medium.com/@dimaswisodewo98/fetch-data-from-api-in-android-studio-kotlin-using-retrofit-with-mvvm-architecture-4f6b673f6a28
 
 
 class MainActivity : AppCompatActivity() {
 
 
-    private lateinit var mainViewModel: MainViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
 
         setContent {
@@ -78,7 +40,7 @@ class MainActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.onSurface
                 ) {
-                    WeatherApp()
+                    MainScreen()
                 }
 
             }
@@ -86,218 +48,46 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    @Preview
+@OptIn(ExperimentalMaterial3Api::class)
+     @Preview
     @Composable
-    fun WeatherApp() {
-        mainViewModel = MainViewModel()
-        subscribe()
+    fun MainScreen() {
+        val navController = rememberNavController()
 
-        var cityName by remember { mutableStateOf("") }
-        var cityNameInput by remember { mutableStateOf("") }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Header()
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Search Field for City Name
-            OutlinedTextField(
-                value = cityName,
-                onValueChange = { cityName = it },
-                label = { Text(text = "Enter your city") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
-            )
-//TODO add handling of special characters sending to API request
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    if (cityName.isNotBlank()) {
-                        mainViewModel.getWeatherData(cityName)
-                        cityNameInput = cityName
-
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Jetpack Compose Navigation") },
+                    navigationIcon = {
+                        Icon(Icons.Default.Person, contentDescription = "Menu")
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                enabled = cityName.isNotBlank()
+                )
+            }
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = "home"
             ) {
-                Icon(Icons.Default.Send, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Send Request")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val weatherData by mainViewModel.weatherData.observeAsState(null)
-            weatherData?.let {
-                CoilImage(it)
-                Spacer(modifier = Modifier.height(16.dp))
-                setResultText(it)
-
-            }
-
-        }
-    }
-
-    // New function for CoilImage
-    @Composable
-    private fun CoilImage(weatherData: CurrentWeatherResponse) {
-        // Get the icon URL from weather data
-        val iconUrl = "https:${weatherData.current?.condition?.icon}"
-        println(iconUrl)
-        // Create a white rounded background for the icon
-        Box(
-            modifier = Modifier
-                .size(120.dp) // Adjust the size as needed
-                .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp)),
-                    contentAlignment = Alignment.Center
-        ) {
-            // Load image from URL using Coil's rememberImagePainter
-            Image(
-                painter = rememberAsyncImagePainter(model = iconUrl),
-                contentDescription = null,
-               contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(bottom = 16.dp)
-                    .clip(CircleShape)
-                    .align(Alignment.Center)
-            )
-        }
-    }
-
-
-    @Composable
-    fun Header() {
-        Text(
-            text = "Weather Forecast",
-            style = MaterialTheme.typography.displaySmall,
-            modifier = Modifier
-                .padding(all = 20.dp)
-        )
-    }
-    @Composable
-    private fun subscribe() {
-        val snackbarHostState = remember { SnackbarHostState() }
-        val scope = rememberCoroutineScope()
-        val isLoading by mainViewModel.isLoading.observeAsState(false)
-        val isError by mainViewModel.isError.observeAsState(false)
-
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(70.dp)
-                    .padding(16.dp)
-            )
-        }
-
-        if (isError) {
-            LaunchedEffect(isError) {
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = "An error occurred",
-                        actionLabel = "Dismiss"
-                    )
+                composable("home") {
+                    HomeScreen(navController)
+                }
+                composable("newScreen") {
+                    InfoScreen()
                 }
             }
         }
-
-        // Display the snackbar
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.padding(16.dp)
-                .background(Color.White)
-        ) {
-            Snackbar(
-modifier = Modifier
-    .background(MaterialTheme.colorScheme.primary)
-            ) {
-                Text(
-                    text =  "An error occured",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable {
-                            snackbarHostState.currentSnackbarData?.dismiss()
-                        }
-                )
-            }
-        }
     }
+
 
     @Composable
-    private fun setResultText(weatherData: CurrentWeatherResponse) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White) // Use the desired background color
-                .padding(16.dp)
-                .border(1.dp, MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                // Display town name in a larger font
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        ) {
-                            append("${weatherData.location?.name}")
-                        }
-                    },
-                    color = Color.Black,
-                    modifier = Modifier.padding(bottom = 8.dp)
-
-                )
-
-                // Display temperature
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontSize = 24.sp)) {
-                            append("${weatherData.current?.tempC}°C")
-                        }
-                    },
-                    color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                // Additional weather information
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontSize = 18.sp)) {
-                            append("Condition: ${weatherData.current?.condition?.text}\n")
-                            append("Country: ${weatherData.location?.country}\n")
-                            append("Timezone ID: ${weatherData.location?.tzId}\n")
-                            append("Local Time: ${weatherData.location?.localtime}\n")
-                            append("Wind speed (kph): ${weatherData.current?.wind_kph}\n")
-                            append("Fahrenheit: ${weatherData.current?.tempF}\n")
-                        }
-                    },
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+    fun HomeScreen(navController: NavHostController) {
+        // Add your home screen UI components here
+        Button(onClick = { navController.navigate("newScreen") }) {
+            Text("Navigate to New Screen")
         }
+        WeatherApp()
     }
-}
+    }
 
 
 
