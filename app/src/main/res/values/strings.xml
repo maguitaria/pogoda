@@ -4,4 +4,6 @@
     <string name="send_request">Send Request\n</string>
     <string name="loading" />
     <string name="my_app" />
+    <string name="info_icon_desc">info\n</string>
+    <string name="back_icon_desc">Go back</string>
 </resources>
