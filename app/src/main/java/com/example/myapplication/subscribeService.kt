@@ -2,12 +2,12 @@ package com.example.myapplication
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -34,10 +34,13 @@ import kotlinx.coroutines.launch
         val isError by mainViewModel.isError.observeAsState(false)
 
         if (isLoading) {
-            CircularProgressIndicator(
+
+                     CircularProgressIndicator(
                 modifier = Modifier
-                    .size(70.dp)
-                    .padding(16.dp)
+                    .size(80.dp)
+                    .padding(10.dp),
+                color = MaterialTheme.colorScheme.onBackground
+
             )
         }
 
@@ -45,8 +48,8 @@ import kotlinx.coroutines.launch
             LaunchedEffect(isError) {
                 scope.launch {
                     snackbarHostState.showSnackbar(
-                        message = "An error occurred",
-                        actionLabel = "Dismiss"
+                        message = "No town found",
+                        duration = SnackbarDuration.Short
                     )
                 }
             }
@@ -55,8 +58,8 @@ import kotlinx.coroutines.launch
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.padding(16.dp)
-                .background(Color.White)
+            modifier = Modifier.padding(5.dp)
+                .background(MaterialTheme.colorScheme.error)
 
         ) { snackbarData ->
             Snackbar(
