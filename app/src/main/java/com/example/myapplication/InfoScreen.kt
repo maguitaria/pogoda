@@ -5,6 +5,8 @@ package com.example.myapplication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,14 +31,23 @@ fun InfoScreen(navController: NavHostController) {
             .background(MaterialTheme.colorScheme.onSurface)
     ) {
 
-        InfoScreenAppBar(navController = navController)
+
 
         Column(
             modifier = Modifier
                 .padding(25.dp)
                 .background(MaterialTheme.colorScheme.onSurface)
         ) {
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(50.dp))
+            Button(onClick ={ navController.navigate("home") }) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_arrow_back_24),
+                    contentDescription = stringResource(id = R.string.back_icon_desc),
+                    modifier = Modifier.clickable {
+                        navController.navigate("home")
+                    }
+                )
+            }
 
             Text(
                 text = "Final Project for Mobile Programming with Kotlin",
@@ -45,37 +56,25 @@ fun InfoScreen(navController: NavHostController) {
             )
 
             Text(
-                text = "Utilizes OpenWeather API for weather data.",
+                text = "Developed by Mariia Glushenkova",
                 style = MaterialTheme.typography.displaySmall,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-
             Text(
-                text = "Give Feedback:",
+                text = "Utilizes OpenAPI Weather API for getting up-to-date data about weather conditions throughout the world.",
+                style = MaterialTheme.typography.displaySmall,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Text(
+                text = "Last updated on 8.03.2024",
                 style = MaterialTheme.typography.displaySmall,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
+
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun InfoScreenAppBar(navController: NavHostController) {
-    TopAppBar(
-        title = { Text("Project Info") },
-        modifier = Modifier.background(MaterialTheme.colorScheme.secondary),
-        navigationIcon = {
-            Icon(
-                painter = painterResource(R.drawable.baseline_arrow_back_24),
-                contentDescription = stringResource(id = R.string.back_icon_desc),
-                modifier = Modifier.clickable {
-                    navController.navigateUp()
-                }
-            )
-        }
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview

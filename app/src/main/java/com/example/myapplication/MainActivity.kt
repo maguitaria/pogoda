@@ -68,8 +68,8 @@ class MainActivity : AppCompatActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Jetpack Compose Navigation") },
-                    modifier = Modifier.background(MaterialTheme.colorScheme.secondary),
+                    title = { Text("") },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.onBackground),
                     navigationIcon = {
                         Icon(
                             painter = painterResource(R.drawable.baseline_info_24),
