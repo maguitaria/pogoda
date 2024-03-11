@@ -3,7 +3,7 @@
 This Android app displays current weather information based on user input or location.
 It utilizes the OpenWeatherMap API to fetch weather data.
 The app follows MVVM architecture.
-
+[Screenshot_20240311_150231.png]
 ## Features
 
 - **Software Logic:** The app includes software logic to retrieve and display current weather data.
