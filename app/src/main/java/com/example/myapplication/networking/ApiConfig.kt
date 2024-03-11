@@ -1,5 +1,6 @@
 package com.example.myapplication.networking
 
+import com.example.myapplication.dotenv
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -11,7 +12,7 @@ class ApiConfig {
 
     companion object {
 
-      //  val API_KEY : String? = System.getenv("API_KEY")
+         val API_KEY = dotenv["API_KEY"]
         fun getApiService() : APIInterface {
             // Api responce interceptor
             val loggingInterceptor = HttpLoggingInterceptor()
@@ -29,7 +30,7 @@ class ApiConfig {
             return retrofit.create(APIInterface::class.java)
 
         }
-       const  val API_KEY = "af0393288db44404bfe95148240702"
+
     }
 
 }

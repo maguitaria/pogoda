@@ -146,7 +146,7 @@ private fun CoilImage(weatherData: CurrentWeatherResponse) {
 fun Header() {
     Text(
         text = "Weather Forecast",
-        style = MaterialTheme.typography.displaySmall,
+        style = MaterialTheme.typography.displayMedium,
         color  = MaterialTheme.colorScheme.primary,
         modifier = Modifier
             .padding(all = 5.dp)

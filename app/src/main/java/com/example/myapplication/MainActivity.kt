@@ -30,10 +30,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.ComposeWeatherAppTheme
 import com.example.myapplication.viewmodel.MainViewModel
-
+import io.github.cdimascio.dotenv.dotenv
 // https://medium.com/@dimaswisodewo98/fetch-data-from-api-in-android-studio-kotlin-using-retrofit-with-mvvm-architecture-4f6b673f6a28
 
-
+val dotenv = dotenv {
+    directory = "/assets"
+    filename = "env"
+}
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

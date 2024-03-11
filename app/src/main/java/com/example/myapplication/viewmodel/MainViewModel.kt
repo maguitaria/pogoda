@@ -10,8 +10,8 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainViewModel : ViewModel() {
-    private val _weatherData = MutableLiveData<CurrentWeatherResponse>()
-    val weatherData: LiveData<CurrentWeatherResponse> get() = _weatherData
+    private val _weatherData = MutableLiveData<CurrentWeatherResponse?>()
+    val weatherData: MutableLiveData<CurrentWeatherResponse?> get() = _weatherData
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
