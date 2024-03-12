@@ -6,7 +6,6 @@ It utilizes the OpenWeatherMap API to fetch weather data.
 -----
 
 <img src="https://github.com/maguitaria/pogoda/assets/112544437/0a874b01-4fee-46cb-aad1-00c1ec8c8755" width="200" height="400" />
-<img src="https://github.com/maguitaria/pogoda/assets/112544437/0a874b01-4fee-46cb-aad1-00c1ec8c8755" width="200" height="400" />
 <img src="https://github.com/maguitaria/pogoda/assets/112544437/aaddd459-0577-4d79-9953-9ddcdebf0104" width="200" height="400"/>
 <img src="https://github.com/maguitaria/pogoda/assets/112544437/27962195-8c88-4a62-85a7-fe8f5c48a70f"width="200" height="400" />
 <img src="https://github.com/maguitaria/pogoda/assets/112544437/eee258d1-9c8f-49e0-9f75-363948ea41e9" width="200" height="400" />
