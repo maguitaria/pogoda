@@ -3,8 +3,12 @@
 This Android app displays current weather information based on user input or location.
 It utilizes the OpenWeatherMap API to fetch weather data.
 The app follows MVVM architecture.
-[Screenshot_20240311_150231.png]
+https://github.com/maguitaria/pogoda/assets/112544437/4c5376ca-517a-4205-9e34-600487137d17
+
 ## Features
+
+
+
 
 - **Software Logic:** The app includes software logic to retrieve and display current weather data.
 - **ViewModel Class:** Implemented ViewModel class to manage the UI state and functionality.
