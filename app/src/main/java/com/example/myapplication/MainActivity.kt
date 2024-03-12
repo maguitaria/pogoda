@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import SplashScreen
 import WeatherApp
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -49,7 +50,15 @@ class MainActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.onSurface
                 ) {
-                    MainScreen()
+                    SplashScreen {
+
+                        setContent {
+                            ComposeWeatherAppTheme {
+                                MainScreen()
+                            }
+                        }
+                    }
+
                 }
 
             }

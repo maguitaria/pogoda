@@ -65,7 +65,7 @@ fun WeatherApp(mainViewModel: MainViewModel = viewModel()) {
         Header()
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Search Field for City Name
+
         OutlinedTextField(
             value = cityName,
             onValueChange = { cityName = it },
@@ -79,7 +79,6 @@ fun WeatherApp(mainViewModel: MainViewModel = viewModel()) {
             singleLine = true,
             textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
         )
-//TODO add handling of special characters sending to API request
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -108,9 +107,7 @@ fun WeatherApp(mainViewModel: MainViewModel = viewModel()) {
             CoilImage(it)
             Spacer(modifier = Modifier.height(16.dp))
             setResultText(it)
-
         }
-
     }
 }
 
@@ -201,7 +198,7 @@ fun setResultText(weatherData: CurrentWeatherResponse) {
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontSize = 24.sp)) {
                         append("${weatherData.current?.condition?.text}\n")
-                        append("Country: ${weatherData.location?.country}")
+                        append(" ${weatherData.location?.country}")
                     }
                 },
                 color = MaterialTheme.colorScheme.secondary,
@@ -211,8 +208,6 @@ fun setResultText(weatherData: CurrentWeatherResponse) {
             Text(
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontSize = 18.sp)) {
-
-                        append("Country: ${weatherData.location?.country}\n")
                         append("Timezone ID: ${weatherData.location?.tzId}\n")
                         append("Local Time: ${weatherData.location?.localtime}\n")
                         append("Wind speed (kph): ${weatherData.current?.wind_kph}\n")

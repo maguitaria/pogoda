@@ -11,6 +11,7 @@
     <string name="info_dev_by">Developed by Mariia Glushenkova</string>
     <string name="info_desc">Utilizes OpenAPI Weather API for getting up-to-date data about weather conditions throughout the world.</string>
     <string name="info_updated">Last updated on 12.03.2024</string>
+    <string name="logo">WEATHERME</string>
 
 
 </resources>
