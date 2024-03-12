@@ -35,9 +35,10 @@ fun SplashScreen(onLoadingComplete: () -> Unit) {
             contentDescription = "App Logo",
             modifier = Modifier.size(150.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = stringResource(R.string.logo),
-            style = MaterialTheme.typography.displaySmall,
+            style = MaterialTheme.typography.displayLarge,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
