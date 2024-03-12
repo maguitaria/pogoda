@@ -1,9 +1,16 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">WeatherMe</string>
     <string name="city_name" />
     <string name="send_request">Send Request\n</string>
     <string name="loading" />
     <string name="my_app" />
     <string name="info_icon_desc">info\n</string>
     <string name="back_icon_desc">Go back</string>
+
+    <string name="info_heading">Final Project for Mobile Programming with Kotlin</string>
+    <string name="info_dev_by">Developed by Mariia Glushenkova</string>
+    <string name="info_desc">Utilizes OpenAPI Weather API for getting up-to-date data about weather conditions throughout the world.</string>
+    <string name="info_updated">Last updated on 12.03.2024</string>
+
+
 </resources>

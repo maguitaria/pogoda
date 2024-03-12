@@ -50,23 +50,23 @@ fun InfoScreen(navController: NavHostController) {
             }
 
             Text(
-                text = "Final Project for Mobile Programming with Kotlin",
+                text =  stringResource(R.string.info_heading),
                 style = MaterialTheme.typography.displayMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             Text(
-                text = "Developed by Mariia Glushenkova",
+                text =  stringResource(R.string.info_dev_by),
                 style = MaterialTheme.typography.displaySmall,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             Text(
-                text = "Utilizes OpenAPI Weather API for getting up-to-date data about weather conditions throughout the world.",
+                text = stringResource(R.string.info_desc),
                 style = MaterialTheme.typography.displaySmall,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             Text(
-                text = "Last updated on 8.03.2024",
+                text = stringResource(R.string.info_updated),
                 style = MaterialTheme.typography.displaySmall,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
