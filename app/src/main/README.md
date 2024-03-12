@@ -21,23 +21,18 @@ The app follows MVVM architecture.
 
 1. **OpenWeatherMap API Key:**
     - Obtain a free API key from [OpenWeatherMap](https://openweathermap.org/api) by signing up.
-    - Place the API key in the `local.properties` file as follows:
-      ```
-      weatherApiKey="YOUR_API_KEY"
-      ```
-
 ### Create an assets folder
-
 Add env (no dot) to the assets folder.
-
+Insert variable API_KEY with given string value from the website of OpenWeather API
 Configure dotenv to search /assets for a file with name env
-
+```
 val dotenv = dotenv {
 directory = "/assets"
 filename = "env" // instead of '.env', use 'env'
 }
-dotenv["MY_ENV_VAR1"]
-
+dotenv["API_KEY"]
+```
+Use link to make the process easier
 Note: The above configuration is required because dot files in /assets do not appear to resolve on Android. (Seeking recommendations from the Android community on how dotenv-kotlin configuration should work in order to provide the best experience for Android developers)
 ## How to Run
 
